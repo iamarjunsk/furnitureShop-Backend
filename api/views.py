@@ -1,6 +1,6 @@
 from flask import render_template, jsonify,request, send_from_directory
 from api import api
-from api.models import items_schema,Item,item_schema
+from api.models import items_schema,Item,item_schema,Image,image_schema
 from app import db
 import os
 from datetime import datetime
@@ -37,12 +37,26 @@ def add_item():
 
 @api.route('/api/item/image', methods=['POST'])
 def add_image():
+    item_id = request.form['id']
+    print(item_id)
     img = request.files['file']
-    print(img)
-    filename=str(datetime.now())+img.filename
+    filename=str(datetime.now().year)+str(datetime.now().month)+str(datetime.now().day)+str(datetime.now().hour)+str(datetime.now().minute)+str(datetime.now().second)+str(datetime.now().microsecond   )
     img.save(os.path.join(UPLOAD_DIRECTORY,filename))
+    itm = Item.query.filter_by(id=item_id).first()
+    im = Image(picname=filename,item=itm)
+    db.session.add(im)
+    db.session.commit()
     return './pics/'+filename,201
 
 @api.route('/pics/<file>')
 def accessfile(file):
     return send_from_directory(UPLOAD_DIRECTORY,file)
+
+@api.route('/test/')
+def test():
+    pics = Image.query.all()
+    # print(pics[0].imgs)
+    ps = images_schema.dump(pics)
+    return jsonify({"pics":ps})
+
+    
