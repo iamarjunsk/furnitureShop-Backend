@@ -40,7 +40,7 @@ def add_image():
     item_id = request.form['id']
     print(item_id)
     img = request.files['file']
-    filename=str(datetime.now().year)+str(datetime.now().month)+str(datetime.now().day)+str(datetime.now().hour)+str(datetime.now().minute)+str(datetime.now().second)+str(datetime.now().microsecond   )
+    filename=str(datetime.now().year)+str(datetime.now().month)+str(datetime.now().day)+str(datetime.now().hour)+str(datetime.now().minute)+str(datetime.now().second)+str(datetime.now().microsecond)+"."+img.filename.split(".")[-1]
     img.save(os.path.join(UPLOAD_DIRECTORY,filename))
     itm = Item.query.filter_by(id=item_id).first()
     im = Image(picname=filename,item=itm)
@@ -52,11 +52,3 @@ def add_image():
 def accessfile(file):
     return send_from_directory(UPLOAD_DIRECTORY,file)
 
-@api.route('/test/')
-def test():
-    pics = Image.query.all()
-    # print(pics[0].imgs)
-    ps = images_schema.dump(pics)
-    return jsonify({"pics":ps})
-
-    
